@@ -7,20 +7,23 @@ int P;
 int **a;
 int **b;
 int **c;
+pthread_mutex_t zavor;
+#define SERIAL 0
+#define MIN(X, Y) (((X) < (Y)) ? (X) : (Y))
 
 void *thread_function(void *arg)
 {
-	int thread_id = *(int *)arg;
+	int id = *(int *)arg;
+	int start = id * (double)N / P;
+    int end = MIN((id + 1) * (double)N / P, N);
 
-	/*
-	for (i = 0; i < N; i++) {
-		for (j = 0; j < N; j++) {
-			for (k = 0; k < N; k++) {
+	for (int i = 0; i < N; i++)
+		for (int j = 0; j < N; j++)
+			for (int k = start; k < end; k++) {
+				pthread_mutex_lock(&zavor);
 				c[i][j] += a[i][k] * b[k][j];
+				pthread_mutex_unlock(&zavor);
 			}
-		}
-	}
-	*/
 
 	pthread_exit(NULL);
 }
@@ -96,6 +99,8 @@ int main(int argc, char *argv[])
 	pthread_t tid[P];
 	int thread_id[P];
 
+	pthread_mutex_init(&zavor, NULL);
+
 	for (i = 0; i < P; i++) {
 		thread_id[i] = i;
 		pthread_create(&tid[i], NULL, thread_function, &thread_id[i]);
@@ -106,6 +111,6 @@ int main(int argc, char *argv[])
 	}
 
 	print(c);
-
+	pthread_mutex_destroy(&zavor);
 	return 0;
 }

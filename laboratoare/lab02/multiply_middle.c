@@ -7,20 +7,19 @@ int P;
 int **a;
 int **b;
 int **c;
+#define SERIAL 0
+#define MIN(X, Y) (((X) < (Y)) ? (X) : (Y))
 
 void *thread_function(void *arg)
 {
-	int thread_id = *(int *)arg;
+	int id = *(int *)arg;
+	int start = id * (double)N / P;
+    int end = MIN((id + 1) * (double)N / P, N);
 
-	/*
-	for (i = 0; i < N; i++) {
-		for (j = 0; j < N; j++) {
-			for (k = 0; k < N; k++) {
+	for (int i = 0; i < N; i++)
+		for (int j = start; j < end; j++)
+			for (int k = 0; k < N; k++)
 				c[i][j] += a[i][k] * b[k][j];
-			}
-		}
-	}
-	*/
 
 	pthread_exit(NULL);
 }
